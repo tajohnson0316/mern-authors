@@ -10,6 +10,6 @@ require("./config/mongoose.config");
 
 app.use(express.json(), express.urlencoded({ extended: true }), cors());
 
-require("./routes/product.routes")(app);
+require("./routes/author.routes")(app);
 
 app.listen(PORT, () => console.log(`❕❕❕ Now listening on port: ${PORT}.`));

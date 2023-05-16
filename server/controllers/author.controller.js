@@ -1,10 +1,15 @@
 const Author = require("../models/author.model");
 
-const findAllAuthors = (_request, response) => {
+// *** GET ALL ***
+module.exports.findAllAuthors = (_request, response) => {
+  /**
+   * .find()
+     @param: none 
+   */
   Author.find()
     .then((allAuthors) => {
       let alphabetizedAuthors = [];
-      const authorNames = allAuthors.filter((author) => author.name).sort();
+      const authorNames = allAuthors.map((author) => author.name).sort();
       for (let authorName of authorNames) {
         for (let author of allAuthors) {
           if (author.name == authorName) {
@@ -12,15 +17,37 @@ const findAllAuthors = (_request, response) => {
           }
         }
       }
+
       console.log({ results: alphabetizedAuthors });
-      response.status(200).response.json({ results: alphabetizedAuthors });
+      response.status(200).json({ results: alphabetizedAuthors });
     })
     .catch((error) => {
       response.status(400).json(error);
     });
 };
 
-const createNewAuthor = (request, response) => {
+// *** GET ONE ***
+module.exports.findOneAuthor = (request, response) => {
+  /** 
+    .findOne({_id: request.params.id})
+    @param: the passed in "id" from the URL
+  */
+  Author.findOne({ _id: request.params.id })
+    .then((author) => {
+      console.log({ results: author });
+      response.status(200).json({ results: author });
+    })
+    .catch((error) => {
+      response.status(400).json(error);
+    });
+};
+
+// *** CREATE ONE ***
+module.exports.createNewAuthor = (request, response) => {
+  /** 
+    .create({request.body})
+    @param: the body/data of the client request
+  */
   const { name } = request.body;
   Author.create({ name })
     .then((newAuthor) => {
@@ -30,4 +57,36 @@ const createNewAuthor = (request, response) => {
     .catch((error) => {
       response.status(400).json(error);
     });
+};
+
+// *** UPDATE ONE ***
+module.exports.updateOneAuthor = (request, response) => {
+  /**
+    .findOneAndUpdate({_id: request.params.id}, request.body, {new, runValidators})
+    @param: the passed in "id" from the URL
+    @param: the body/data of the client request
+    @param: update options
+  */
+  Author.updateOne({ _id: request.params.id }, request.body, {
+    new: true,
+    runValidators: true,
+  })
+    .then((author) => {
+      console.log("UPDATE RESULTS ==>", author);
+      response.status(200).json({ results: author });
+    })
+    .catch((error) => {
+      response.status(400).json(error);
+    });
+};
+
+// *** DELETE ONE ***
+module.exports.deleteOneAuthor = (request, response) => {
+  /**
+    .deleteOne({_id: request.params.id})
+    @param: the passed in "id" from the URL
+  */
+  Author.deleteOne({ _id: request.params.id })
+    .then((deleteConfirmation) => response.status(200).json(deleteConfirmation))
+    .catch((error) => response.status(400).json(error));
 };
